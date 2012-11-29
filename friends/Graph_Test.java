@@ -74,8 +74,8 @@ public class Graph_Test {
         	line = br2.readLine();
         	friendsBuk.add(line);
         }
-        
-        //build graph here
+        Person[] graph = new Person[count];
+        graph = build(personBuk, friendsBuk);
        
         int choice = getChoice();
         while (choice != QUIT) {
