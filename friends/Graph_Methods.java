@@ -3,12 +3,7 @@ package graph;
 import java.io.*;
 import java.util.StringTokenizer;
 
-/**
- * This class implements a term of a polynomial.
- *
- * @author runb-cs112
- *
- */
+
 class Term {
     /**
      * name of term.
