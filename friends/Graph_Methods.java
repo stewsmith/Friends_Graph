@@ -107,7 +107,7 @@ public class Graph_Methods {
  
    
   public Person[] build(String[] people, ArrayList<String> friends){
-	   Person[] zoo = new Person[people.length];
+	   Person[] zoo = new Person[people.length];   // does zoo need to be a gloabal variable?
 	   for(int i=0; i<people.length; i++){		// go through people
 		   String raw = people[i];
 		   String school=null;
