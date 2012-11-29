@@ -108,30 +108,7 @@ public class Graph_Methods {
         poly = null;
     }
    
-    /**
-     * Reads a polynomial from an input stream (file or keyboard). The storage format
-     * of the polynomial is:
-     * <pre>
-     *     <name> <school>
-     *     <name> <school>
-     *     ...
-     *     <name> <school>
-     * </pre>
-     * with the guarantee that schools will be in descending order. For example:
-     * <pre>
-     *      4 5
-     *     -2 3
-     *      2 1
-     *      3 0
-     * </pre>
-     * which represents the polynomial:
-     * <pre>
-     *      4*x^5 - 2*x^3 + 2*x + 3
-     * </pre>
-     *
-     * @param br BufferedReader from which a polynomial is to be read
-     * @throws IOException If there is any input error in reading the polynomial
-     */
+
     public Polynomial(BufferedReader br) throws IOException {
         String line;
         StringTokenizer tokenizer;
