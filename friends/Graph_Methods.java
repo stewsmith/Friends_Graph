@@ -1,6 +1,7 @@
 package graph;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 /**
@@ -132,23 +133,39 @@ public class Graph_Methods {
      * @param br BufferedReader from which a polynomial is to be read
      * @throws IOException If there is any input error in reading the polynomial
      */
-    public Polynomial(BufferedReader br) throws IOException {
-        String line;
-        StringTokenizer tokenizer;
-        float name;
-        int school;
-       
-        poly = null;
-       
-        while ((line = br.readLine()) != null) {
-            tokenizer = new StringTokenizer(line);
-            name = Float.parseFloat(tokenizer.nextToken());
-            school = Integer.parseInt(tokenizer.nextToken());
-            poly = new Node(name, school, poly);
-        }
-    }
+//    public Polynomial(BufferedReader br) throws IOException {
+//        String line;
+//        StringTokenizer tokenizer;
+//        float name;
+//        int school;
+//       
+//        poly = null;
+//       
+//        while ((line = br.readLine()) != null) {
+//            tokenizer = new StringTokenizer(line);
+//            name = Float.parseFloat(tokenizer.nextToken());
+//            school = Integer.parseInt(tokenizer.nextToken());
+//            poly = new Node(name, school, poly);
+//        }
+//    }
    
-   public build()
+   public void build(String[] people, ArrayList<String> friends){
+	   Person[] zoo = new Person[people.length];
+	   for(int i=0; i<people.length; i++){		// go through people
+		   String nameNschool = people[i];
+		   String school;
+		   String name;
+		   
+		   name = nameNschool.substring(0, nameNschool.indexOf("|"));	//get name until '|'
+		   if(nameNschool.charAt(nameNschool.indexOf("|")+1)=='y'){				//attends school?
+			   school=nameNschool.substring(nameNschool.lastIndexOf('|'), nameNschool.length()-1);
+		   }
+		  
+		   
+		   Person body = new Person(name, school);
+		   zoo[i]= body;
+	   }
+   }
 
     public Person subgraph(String school) {
         /** COMPLETE THIS METHOD **/
@@ -162,9 +179,9 @@ public class Graph_Methods {
      * @param p Polynomial with which this polynomial is to be multiplied
      * @return A new polynomial which is the product of this polynomial and p.
      */
-    public Polynomial multiply(Polynomial p) {
+    public void multiply() {
         /** COMPLETE THIS METHOD **/
-        return null;
+        
     }
    
     /**
