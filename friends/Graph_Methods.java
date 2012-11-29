@@ -161,18 +161,22 @@ public class Graph_Methods {
 		   zoo[i]= body;							//put him in the zoo
 	   }
 	   
-	   for(int j=0; j<friends.size(); j++){		//go through the friends
+	  for(int j=0; j<friends.size(); j++){		//go through the friends
 		   String raw = friends.get(j);
 		   String first = raw.substring(0, raw.indexOf('|'));		//the first friend name
-		   String last = raw.substring(raw.indexOf('|'));			//the second friend name
-		   
-		   for(int k=0; k<zoo.length; k++){			//searching array --- there is probably a better way
+		   String second = raw.substring(raw.indexOf('|'));			//the second friend name
+
+		   for(int k=0; k<zoo.length; k++){		//searching array --- there is probably a better way
+			   Person firstPerson = new Person(null, null, null);
+			   Person secondPerson = new Person(null, null, null);
 			   if (zoo[k].name.equalsIgnoreCase(first)){		//the names match
-				   Person firstPerson = zoo[k];
+				   firstPerson = zoo[k];
 			   }
-			   if(zoo[k].name.equalsIgnoreCase(last)){
-				   Person secondPerson = zoo[k];
+			   if(zoo[k].name.equalsIgnoreCase(second)){
+				   secondPerson = zoo[k];
 			   }
+			   firstPerson.next = secondPerson;
+			   secondPerson.next = firstPerson;
 		   }
 				  
 	   }
