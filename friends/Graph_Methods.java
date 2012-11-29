@@ -144,28 +144,40 @@ public class Graph_Methods {
 //        }
 //    }
    
-   public void build(String[] people, ArrayList<String> friends){
+  public Person[] build(String[] people, ArrayList<String> friends){
 	   Person[] zoo = new Person[people.length];
 	   for(int i=0; i<people.length; i++){		// go through people
-		   String nameNschool = people[i];
-		   String school;
+		   String raw = people[i];
+		   String school=null;
 		   String name;
 		   
-		   name = nameNschool.substring(0, nameNschool.indexOf("|"));	//get name until '|'
-		   if(nameNschool.charAt(nameNschool.indexOf("|")+1)=='y'){				//attends school?
-			   school=nameNschool.substring(nameNschool.lastIndexOf('|'), nameNschool.length()-1);
+		   name = raw.substring(0, raw.indexOf("|"));	//get name until '|'
+		   if(raw.charAt(raw.indexOf("|")+1)=='y'){				//attends school?
+			   school=raw.substring(raw.lastIndexOf('|'), raw.length()-1);	//get the schoolname
 		   }
 		  
 		   
-		   Person body = new Person(name, school);
-		   zoo[i]= body;
+		   Person body = new Person(name, school);	//create a new person
+		   zoo[i]= body;							//put him in the zoo
 	   }
+	   
+	   for(int j=0; j<friends.size(); j++){		//go through the friends
+		   String raw = friends.get(j);
+		   String first = raw.substring(0, raw.indexOf('|'));		//the first friend name
+		   String last = raw.substring(raw.indexOf('|'));			//the second friend name
+		   
+		   for(int k=0; k<zoo.length; k++){			//searching array --- there is probably a better way
+			   if (zoo[k].name.equalsIgnoreCase(first)){		//the names match
+				   Person firstPerson = zoo[k];
+			   }
+			   if(zoo[k].name.equalsIgnoreCase(last)){
+				   Person secondPerson = zoo[k];
+			   }
+		   }
+				  
+	   }
+	   return zoo;		//temporary return
    }
-
-    public Person subgraph(String school) {
-        /** COMPLETE THIS METHOD **/
-        return null;
-    }
    
     /**
      * Returns the polynomial obtained by multiplying the given polynomial p
