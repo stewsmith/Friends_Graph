@@ -74,7 +74,7 @@ public class Graph_Test {
         	line = br2.readLine();
         	friendsBuk.add(line);
         }
-        Person[] graph = new Person[count];  //I understadn this is initiallizing the graph but what is Person[count]?
+        Person[] graph = new Person[count];  //ANS: Person[count] is the syntax to make an person array with size count
         graph = build(personBuk, friendsBuk);
        
         int choice = getChoice();
