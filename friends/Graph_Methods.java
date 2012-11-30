@@ -137,8 +137,16 @@ public class Graph_Methods {
 			   if(zoo[k].name.equalsIgnoreCase(second)){
 				   secondPerson = zoo[k];
 			   }
-			   firstPerson.next = secondPerson;  //it looks like every time a new friend is added we lose a pointer to the pervious frineds
-			   secondPerson.next = firstPerson;
+			   if(firstPerson.next != null){		//attach the second friend to the 
+				   Person temp = firstPerson.next;	//first without losing old friend chain
+				   firstPerson.next = secondPerson;
+				   secondPerson.next = temp;
+			   }else firstPerson.next = secondPerson;
+			   if(secondPerson.next != null){		//attach the first friend to the second 
+				   Person temp = secondPerson.next;	//without losing old friend chain
+				   secondPerson.next = firstPerson;
+				   firstPerson.next = temp;
+			   }else secondPerson.next = firstPerson;
 		   }
 				  
 	   }
