@@ -123,8 +123,8 @@ public class Graph_Test {
  		   String raw = friends.get(j);
  		   String first = raw.substring(0, raw.indexOf('|'));		//the first friend name
  		   String second = raw.substring(raw.indexOf('|')+1);			//the second friend name
- 		   Person firstPerson = new Person(null, null, null);
- 		   Person secondPerson = new Person(null, null, null);
+ 		   Person firstPerson;
+ 		   Person secondPerson;
  		   boolean firstAssigned = false;
  		   boolean secAssigned = false;
 
