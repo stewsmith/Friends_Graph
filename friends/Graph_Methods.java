@@ -83,6 +83,10 @@ class Term {
        
     }
    
+    public void connectors() {
+        /** COMPLETE THIS METHOD **/
+       
+    }
   
    
 }
