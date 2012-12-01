@@ -91,7 +91,7 @@ public class Graph_Test {
 			choice = getChoice();
 		}
 	}
-
+	//FIX NEEDED--- school is case insensitive
 	public static Person[] build(String[] people, ArrayList<String> friends){
 		Person[] zoo = new Person[people.length];
 		for(int i=0; i<people.length; i++){		// go through names and make them people
@@ -104,7 +104,7 @@ public class Graph_Test {
 			if(raw.charAt(raw.indexOf("|")+1)=='y'){				//attends school?
 				school=raw.substring(raw.lastIndexOf('|')+1, raw.length());	//get the schoolname
 			}
-			Person body = new Person(name, school, null);	//create a new person
+			Person body = new Person(name, school, null, false, -1);	//create a new person
 			zoo[i]= body;							//put him in the zoo
 		}
 
@@ -146,7 +146,7 @@ public class Graph_Test {
 		ArrayList<Person> schoolZoo = new ArrayList<>();
 		for(int i=0; i< zoo.length; i++){			//go through all people in zoo----linear
 			if(zoo[i].school != null && zoo[i].school.equals(school)){		//if their school matches
-				Person tempPer = new Person(zoo[i].name, zoo[i].school, zoo[i].front);	//copy zoo person
+				Person tempPer = new Person(zoo[i].name, zoo[i].school, zoo[i].front, false, i);	//copy zoo person
 				schoolZoo.add(tempPer);				//add the person to the arrayList
 			}
 		}
@@ -155,7 +155,7 @@ public class Graph_Test {
 			Friendex ptr = student.front;
 			Friendex prev = null;
 			while(ptr != null){		//go through the attached chain
-				if(zoo[ptr.friendNum].school != null && !zoo[ptr.friendNum].school.equals(school)){
+				if(zoo[ptr.friendNum].school == null || !zoo[ptr.friendNum].school.equals(school)){
 					if(prev==null){			//first person doesn't attend target school
 						student.front = ptr.next;
 					}else{
@@ -167,6 +167,34 @@ public class Graph_Test {
 				ptr=ptr.next;
 			}
 		}
+		printSub(schoolZoo, zoo);
 		return schoolZoo;
 	}
-}
+	
+	public static void printSub(ArrayList<Person> schoolZoo, Person[] zoo){
+		for(int i=0; i<schoolZoo.size(); i++){		//print out names and school--- i.e. "nick|y|rutgers"
+			String name = schoolZoo.get(i).name;
+			String school =schoolZoo.get(i).school;
+			if(school != null){
+				System.out.println(name + "|y|" + school);
+			}else{
+				System.out.println(name + "|n");
+			}
+		}
+		//print out relationships--- i.e. "kaitlin|nick"
+		for(int k=0; k<schoolZoo.size(); k++){			//run through vertical array
+			String first = schoolZoo.get(k).name;
+			Person test = zoo[schoolZoo.get(k).zooIndex];
+			test.visited =true;		//refers back to zoo from schoolZoo index
+			Friendex ptr = schoolZoo.get(k).front;
+			while(ptr!=null){							//run through horizontal LL
+				if(!(zoo[schoolZoo.get(k).zooIndex].visited && zoo[ptr.friendNum].visited)){		//if one isn't marked, print them out
+					String second = zoo[ptr.friendNum].name;
+					System.out.println(first+ "|" + second);
+					zoo[ptr.friendNum].visited = true;
+				}
+				ptr=ptr.next;
+			}
+		}
+	}
+}	//end GraphTest class
