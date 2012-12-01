@@ -1,8 +1,9 @@
 package friends;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.*;
+import java.lang.*;
+
 
 
 public class Graph_Test {
@@ -28,17 +29,12 @@ public class Graph_Test {
 	}
 	
 
-	public static void shortest()
-			throws IOException {
-		System.out.print("Enter the name of the lonely boy => ");
-		String lone = stdin.nextLine();
-
-	}
+	
 
 	public static void cliques()
 			throws IOException {
 		System.out.println("Enter the name of the school => ");
-		String x = stdin.nextLine();
+		String school = stdin.nextLine();
 
 	}
 
@@ -69,8 +65,8 @@ public class Graph_Test {
 			friendsBuk.add(line);
 		}
 
-		Person[] graph = new Person[count];
-		graph = build(personBuk, friendsBuk);		//FUCK HOW DOES THIS SYNTAX WORK?!?!
+		Person[] zoo = new Person[count];
+		zoo = build(personBuk, friendsBuk);		//FUCK HOW DOES THIS SYNTAX WORK?!?!
 		
 		int choice = getChoice();
 		while (choice != QUIT) {
@@ -80,9 +76,14 @@ public class Graph_Test {
 				switch (choice) {
 				case STUDENTS: 
 					System.out.print("Enter the name of the school => ");
-					String sc = stdin.nextLine();
-					subgraph(sc, graph); break;
-				case SHORT: shortest(); break;
+					String school = stdin.nextLine();
+					subgraph(school, zoo); break;
+				case SHORT: 
+					System.out.print("Enter the name of the starting person => ");
+					String start = stdin.nextLine();
+					System.out.print("Enter the name of the starting person => ");
+					String target = stdin.nextLine();
+					shortest(start, target, zoo); break;
 				case CLIQUE: cliques(); break;
 				case CONNECT: connectors(); break;    //revise
 				default: break;
@@ -195,6 +196,22 @@ public class Graph_Test {
 				}
 				ptr=ptr.next;
 			}
+		}
+	}
+	
+	public static void shortest(String start, String target, Person[] zoo)throws IOException {
+		Person perStart = null;
+		int startDex = -1;
+		for(int i=0; i<zoo.length;i++){
+			if(zoo[i].name.equals(start)){
+				perStart = zoo[i];
+				startDex = i;
+			}
+			Queue<Friendex> newQ = new LinkedList<Friendex>();
+			while (!newQ.isEmpty()){
+			
+
+		}
 		}
 	}
 }	//end GraphTest class
