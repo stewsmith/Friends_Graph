@@ -6,7 +6,7 @@ package friends;
 import java.io.*;
 import java.util.*;
 import java.util.Queue;
-import java.lang.*;
+
 
 
 
@@ -66,28 +66,34 @@ public class Graph_Test {
 				case STUDENTS: 
 					System.out.print("Enter the name of the school => ");
 					String school = stdin.nextLine();
-					subgraph(school, zoo, true); break;
+					subgraph(school, zoo, true); 
+					break;
 				case SHORT: 
 					System.out.print("Enter the name of the starting person => ");
 					String start = stdin.nextLine();
 					System.out.print("Enter the name of the target person => ");
 					String target = stdin.nextLine();
-					shortest(start, target, zoo); break;
+					shortest(start, target, zoo); 
+					break;
 				case CLIQUE: 
 					System.out.print("Enter the name of the school => ");
 					String sc = stdin.nextLine();
-					cliques(sc, zoo); break;	
-					//case CONNECT: connectors(); break;    
+					cliques(sc, zoo); 
+					break;	
+				case CONNECT: 
+					connectors(zoo);
+					break;    
 				default: break;
 				}
 			}
 			choice = getChoice();
 			for(int i=0; i<zoo.length;i++){			//reset visited each time
 				zoo[i].visited=false;
+				zoo[i].back = -1;
 			}
 		}
 	}
-	//FIX NEEDED--- school is case insensitive
+	
 	public static Person[] build(String[] people, ArrayList<String> friends){
 		Person[] zoo = new Person[people.length];
 		for(int i=0; i<people.length; i++){		// go through names and make them people
@@ -100,7 +106,7 @@ public class Graph_Test {
 			if(raw.charAt(raw.indexOf("|")+1)=='y'){				//attends school?
 				school=raw.substring(raw.lastIndexOf('|')+1, raw.length());	//get the schoolname
 			}
-			Person body = new Person(name, school, null, false, -1,-1,-1);	//create a new person
+			Person body = new Person(name, school, null, false, -1,-1,-1,-1);	//create a new person
 			zoo[i]= body;							//put him in the zoo
 		}
 
@@ -143,9 +149,9 @@ public class Graph_Test {
 		ArrayList<Person> schoolZoo = new ArrayList<>();
 		int schoolZoodex = 0;
 		for(int i=0; i< zoo.length; i++){			//go through all people in zoo----linear	
-			if(zoo[i].school != null && zoo[i].school.equals(school)){		//if their school matches
+			if(zoo[i].school != null && zoo[i].school.equalsIgnoreCase(school)){		//if their school matches
 				zoo[i].schoolIndex=schoolZoodex;
-				Person tempPer = new Person(zoo[i].name, zoo[i].school, zoo[i].front, false, i,schoolZoodex,-1);	//copy zoo person
+				Person tempPer = new Person(zoo[i].name, zoo[i].school, zoo[i].front, false, i,schoolZoodex,-1,-1);	//copy zoo person
 				schoolZoo.add(tempPer);				//add the person to the arrayList
 				schoolZoodex++;
 			}
@@ -205,18 +211,18 @@ public class Graph_Test {
 	public static void shortest(String start, String target, Person[] zoo)throws IOException {
 		Person perStart = null;
 		Stack<Person> printStack = new Stack<Person>();
-		int startDex = -1;
 		Queue<Integer> newQ = new LinkedList<Integer>();
 		boolean complete = false;		//SS
+		
 		for(int i=0; i<zoo.length;i++){ // finds the start person in zoo
-			if(zoo[i].name.equals(start)){
+			if(zoo[i].name.equalsIgnoreCase(start)){
 				perStart = zoo[i];
-				startDex = i;
 				zoo[i].zooIndex= i;
 				newQ.add(i);  // add the start person to queue for BFS
 				break;			// SS added--- person found break out of loop
 			}
 		}
+		
 		while (!newQ.isEmpty()){          //BFS queue build
 			if(complete) break;		//SS
 			zoo[newQ.peek()].visited = true;
@@ -226,17 +232,17 @@ public class Graph_Test {
 				Person temp = zoo[friendPtr.friendNum];  //friend currently looking at
 				if (!temp.visited){ //unvisited friends
 					temp.zooIndex = friendPtr.friendNum;
-					temp.shortest = parent.zooIndex;  //tells where the person came from
+					temp.back = parent.zooIndex;  //tells where the person came from
 				}
 				else{		//if friend has already been visited
 					friendPtr = friendPtr.next;
 					continue;
 				} 
-				if (target.equals(temp.name)){ // target is found
+				if (target.equalsIgnoreCase(temp.name)){ // target is found
 					Person parentPtr = temp;
 					while (parentPtr.zooIndex != perStart.zooIndex){ //moves back and populates print stack
 						printStack.push(parentPtr);
-						parentPtr=zoo[parentPtr.shortest];
+						parentPtr=zoo[parentPtr.back];
 					}
 					printStack.push(perStart);	//  SS----adds last starting person to printStack
 					complete = true;	//SS
@@ -247,7 +253,7 @@ public class Graph_Test {
 			}
 		}
 		String answer = "";
-		if(printStack.isEmpty()){
+		if(printStack.isEmpty()){	
 			System.out.println("No possible path");
 		}
 		else{
@@ -301,6 +307,40 @@ public class Graph_Test {
 				System.out.println(name + "|" + "y" + "|" + sch);
 			}
 		}
-
 	}
+	
+	public static void connectors(Person[] zoo){
+		dfs(zoo);
+	}
+	
+	private static void dfs(Person[] zoo){
+		for(int i=0; i<zoo.length; i++){		//move vertically looking for new cliques
+			Person dfsStart = zoo[i];
+			
+			if(!dfsStart.visited){
+				Stack<Person> dfsStack = new Stack<Person>();
+				dfsStack.push(dfsStart);
+				dfsStart.visited=true;
+				while(!dfsStack.isEmpty()){			//stack allows forward movement when push and backward when popped
+					Person curr = dfsStack.peek();
+					Friendex ptr = curr.front;
+					while(ptr != null){						//moves horizontally through friends
+						if(!zoo[ptr.friendNum].visited){	//get the first friend that isn't already visited
+							Person currFriend = zoo[ptr.friendNum];
+							currFriend.visited =true;
+							dfsStack.push(currFriend);		//moving forward in graph
+							break;
+						}
+						ptr = ptr.next;
+					}
+					if(ptr == null){		//no more friends
+						Person backwards = dfsStack.pop();
+					}
+					
+				}
+			}
+		}
+		
+	}
+	
 }	//end GraphTest class
