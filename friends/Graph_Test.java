@@ -82,14 +82,14 @@ public class Graph_Test {
 				case SHORT: 
 					System.out.print("Enter the name of the starting person => ");
 					String start = stdin.nextLine();
-					System.out.print("Enter the name of the starting person => ");
+					System.out.print("Enter the name of the target person => ");
 					String target = stdin.nextLine();
 					shortest(start, target, zoo); break;
 				case CLIQUE: 
 					System.out.print("Enter the name of the school => ");
 					String sc = stdin.nextLine();
 					cliques(sc, zoo); break;	
-				case CONNECT: connectors(); break;    //revise
+				case CONNECT: connectors(); break;    
 				default: break;
 				}
 			}
@@ -109,7 +109,7 @@ public class Graph_Test {
 			if(raw.charAt(raw.indexOf("|")+1)=='y'){				//attends school?
 				school=raw.substring(raw.lastIndexOf('|')+1, raw.length());	//get the schoolname
 			}
-			Person body = new Person(name, school, null, false, -1,-1);	//create a new person
+			Person body = new Person(name, school, null, false, -1,-1,-1);	//create a new person
 			zoo[i]= body;							//put him in the zoo
 		}
 
@@ -148,13 +148,13 @@ public class Graph_Test {
 		return zoo;		
 	}
 	public static ArrayList<Person> subgraph(String school, Person[] zoo, boolean printSub){
-		
+
 		ArrayList<Person> schoolZoo = new ArrayList<>();
 		int schoolZoodex = 0;
 		for(int i=0; i< zoo.length; i++){			//go through all people in zoo----linear	
 			if(zoo[i].school != null && zoo[i].school.equals(school)){		//if their school matches
 				zoo[i].schoolIndex=schoolZoodex;
-				Person tempPer = new Person(zoo[i].name, zoo[i].school, zoo[i].front, false, i,schoolZoodex);	//copy zoo person
+				Person tempPer = new Person(zoo[i].name, zoo[i].school, zoo[i].front, false, i,schoolZoodex,-1);	//copy zoo person
 				schoolZoo.add(tempPer);				//add the person to the arrayList
 				schoolZoodex++;
 			}
@@ -213,29 +213,60 @@ public class Graph_Test {
 
 	public static void shortest(String start, String target, Person[] zoo)throws IOException {
 		Person perStart = null;
+		Stack<Person> printStack = new Stack<Person>();
 		int startDex = -1;
-		for(int i=0; i<zoo.length;i++){
+		Queue<Integer> newQ = new LinkedList<Integer>();
+		for(int i=0; i<zoo.length;i++){ // finds the start person in zoo
 			if(zoo[i].name.equals(start)){
 				perStart = zoo[i];
 				startDex = i;
+				zoo[i].zooIndex= i;
+				newQ.add(i);  // add the start person to queue for BFS
 			}
-
-			//Queue<Friendex> newQ = new Queue<Friendex>();
-			Queue<Friendex> myq = new LinkedList<Friendex>();
-
 		}
-	}
+			while (!newQ.isEmpty()){          //BFS queue build
+				zoo[newQ.peek()].visited = true;
+				Person parent = zoo[newQ.poll()];
+				Friendex friendPtr = parent.front;
+				while (friendPtr!=null){              //move through friends
+					Person temp = zoo[friendPtr.friendNum];  //friend currently looking at
+					if (!zoo[friendPtr.friendNum].visited){ //unvisited friends
+						temp.zooIndex = friendPtr.friendNum;
+						temp.shortest = parent.zooIndex;  //tells where the person came from
+					}
+					else{friendPtr = friendPtr.next;} //if friend has already been visited
+					if (target.equals(temp.name)){ // target is found
+						Person parentPtr = temp;
+						while (parentPtr.zooIndex != perStart.zooIndex){ //moves back and populates print stack
+							printStack.push(parentPtr);
+							parentPtr=zoo[parentPtr.shortest];
+						}
+					}else {newQ.add(friendPtr.friendNum); //if temp is not the target put on BFS queue
+					friendPtr=friendPtr.next;			
+					}	
+				}
+			}
+			String answer = "";
+			while (!printStack.isEmpty()){
+				String name = printStack.pop().name;
+				answer += name + "--";
+			}
+			answer = answer.substring(0,answer.length()-2);
+		}
+	
 
 	public static void cliques(String school, Person[] zoo){
 
 		ArrayList<Person> schoolZoo = subgraph(school, zoo, false);	//creates subgraph with school
-		ArrayList<Person[]> answer = new ArrayList<>(); 		
+		ArrayList<ArrayList<Person>> answer = new ArrayList<>(); 		
 
 		for(int i=0; i< schoolZoo.size(); i++){		//go through vertical array
 			Person vert = schoolZoo.get(i);
 			Queue<Person> newQ = new LinkedList<Person>();
+			ArrayList<Person> newClique = new ArrayList<>();
+			boolean addClique = false;
 			if(!vert.visited){		//the person has not been visited so he must be part of a new clique
-				ArrayList<Person> newClique = new ArrayList<>();
+				addClique =true;
 				newQ.add(vert);
 				while(!newQ.isEmpty()){
 					Person justDQd = newQ.remove();
@@ -243,12 +274,26 @@ public class Graph_Test {
 					newClique.add(justDQd);
 					Friendex ptr = justDQd.front;
 					while(ptr != null){				//go through LL horizontally 
-						newQ.add(schoolZoo.get(ptr.friendNum));
+						if(!schoolZoo.get(ptr.friendNum).visited){
+							newQ.add(schoolZoo.get(ptr.friendNum));
+						}
 						ptr = ptr.next;
 					}
 				}
 			}
-			vert.visited = true;
+			if(addClique){
+				answer.add(newClique);
+			}
+		}
+		//Print out the cliques and members
+		for(int p=0; p<answer.size(); p++){
+			ArrayList <Person> clique = answer.get(p);
+			System.out.println("Clique " + (p+1) +":");
+			for(int k=0; k<clique.size(); k++){
+				String name = clique.get(k).name;
+				String sch = clique.get(k).school;
+				System.out.println(name + "|" + "y" + "|" + sch);
+			}
 		}
 
 	}
