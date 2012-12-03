@@ -6,13 +6,15 @@ public class Person{
 	public Friendex front;
 	public boolean visited;
 	public int zooIndex;
+	public int schoolIndex;
 	
-	public Person(String name, String school, Friendex front, boolean visited, int zooIndex){	//ArrayList<Person> friendList
+	public Person(String name, String school, Friendex front, boolean visited, int zooIndex, int schoolIndex){	//ArrayList<Person> friendList
 		this.name = name;
 		this.school = school;
 		this.front= front;
 		this.visited = visited;
 		this.zooIndex = zooIndex;
+		this.schoolIndex = schoolIndex;
 	}
 }
 
