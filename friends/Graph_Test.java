@@ -1,3 +1,6 @@
+/*Written by Stewart Smith and Jake Skelci for CS 112 Fall 2012*/
+
+
 package friends;
 
 import java.io.*;
@@ -29,21 +32,6 @@ public class Graph_Test {
 		return (Integer.parseInt(br1.readLine()));
 	}
 
-
-
-
-	public static void cliques()
-			throws IOException {
-		System.out.println("Enter the name of the school => ");
-		String school = stdin.nextLine();
-
-	}
-
-	public static void connectors(){
-
-
-	}
-
 	public static void main(String[] args) throws IOException {
 		br1 = new BufferedReader(new InputStreamReader(System.in));
 		System.out.print("Enter the name of the friendship file => ");
@@ -67,7 +55,7 @@ public class Graph_Test {
 		}
 
 		Person[] zoo = new Person[count];
-		zoo = build(personBuk, friendsBuk);		//FUCK HOW DOES THIS SYNTAX WORK?!?!
+		zoo = build(personBuk, friendsBuk);	
 
 		int choice = getChoice();
 		while (choice != QUIT) {
@@ -89,11 +77,14 @@ public class Graph_Test {
 					System.out.print("Enter the name of the school => ");
 					String sc = stdin.nextLine();
 					cliques(sc, zoo); break;	
-				case CONNECT: connectors(); break;    
+					//case CONNECT: connectors(); break;    
 				default: break;
 				}
 			}
 			choice = getChoice();
+			for(int i=0; i<zoo.length;i++){			//reset visited each time
+				zoo[i].visited=false;
+			}
 		}
 	}
 	//FIX NEEDED--- school is case insensitive
@@ -216,44 +207,59 @@ public class Graph_Test {
 		Stack<Person> printStack = new Stack<Person>();
 		int startDex = -1;
 		Queue<Integer> newQ = new LinkedList<Integer>();
+		boolean complete = false;		//SS
 		for(int i=0; i<zoo.length;i++){ // finds the start person in zoo
 			if(zoo[i].name.equals(start)){
 				perStart = zoo[i];
 				startDex = i;
 				zoo[i].zooIndex= i;
 				newQ.add(i);  // add the start person to queue for BFS
+				break;			// SS added--- person found break out of loop
 			}
 		}
-			while (!newQ.isEmpty()){          //BFS queue build
-				zoo[newQ.peek()].visited = true;
-				Person parent = zoo[newQ.poll()];
-				Friendex friendPtr = parent.front;
-				while (friendPtr!=null){              //move through friends
-					Person temp = zoo[friendPtr.friendNum];  //friend currently looking at
-					if (!zoo[friendPtr.friendNum].visited){ //unvisited friends
-						temp.zooIndex = friendPtr.friendNum;
-						temp.shortest = parent.zooIndex;  //tells where the person came from
-					}
-					else{friendPtr = friendPtr.next;} //if friend has already been visited
-					if (target.equals(temp.name)){ // target is found
-						Person parentPtr = temp;
-						while (parentPtr.zooIndex != perStart.zooIndex){ //moves back and populates print stack
-							printStack.push(parentPtr);
-							parentPtr=zoo[parentPtr.shortest];
-						}
-					}else {newQ.add(friendPtr.friendNum); //if temp is not the target put on BFS queue
-					friendPtr=friendPtr.next;			
-					}	
+		while (!newQ.isEmpty()){          //BFS queue build
+			if(complete) break;		//SS
+			zoo[newQ.peek()].visited = true;
+			Person parent = zoo[newQ.poll()]; //dequeue front
+			Friendex friendPtr = parent.front;
+			while (friendPtr!=null){              //move horizontally through friends
+				Person temp = zoo[friendPtr.friendNum];  //friend currently looking at
+				if (!temp.visited){ //unvisited friends
+					temp.zooIndex = friendPtr.friendNum;
+					temp.shortest = parent.zooIndex;  //tells where the person came from
 				}
+				else{		//if friend has already been visited
+					friendPtr = friendPtr.next;
+					continue;
+				} 
+				if (target.equals(temp.name)){ // target is found
+					Person parentPtr = temp;
+					while (parentPtr.zooIndex != perStart.zooIndex){ //moves back and populates print stack
+						printStack.push(parentPtr);
+						parentPtr=zoo[parentPtr.shortest];
+					}
+					printStack.push(perStart);	//  SS----adds last starting person to printStack
+					complete = true;	//SS
+					break;	//  SS--- target found so break out of loop
+				}else {newQ.add(friendPtr.friendNum); //if temp is not the target put on BFS queue
+				friendPtr=friendPtr.next;			
+				}	
 			}
-			String answer = "";
+		}
+		String answer = "";
+		if(printStack.isEmpty()){
+			System.out.println("No possible path");
+		}
+		else{
 			while (!printStack.isEmpty()){
 				String name = printStack.pop().name;
 				answer += name + "--";
 			}
 			answer = answer.substring(0,answer.length()-2);
+			System.out.println(answer);
 		}
-	
+	}
+
 
 	public static void cliques(String school, Person[] zoo){
 
