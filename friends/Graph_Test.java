@@ -1,14 +1,10 @@
 /*Written by Stewart Smith and Jake Skelci for CS 112 Fall 2012*/
 
-
 package friends;
 
 import java.io.*;
 import java.util.*;
 import java.util.Queue;
-
-
-
 
 public class Graph_Test {
 	static BufferedReader br1, br2;
@@ -54,8 +50,9 @@ public class Graph_Test {
 			friendsBuk.add(line);
 		}
 
+		Hashtable<String, Integer> hash = new Hashtable<String, Integer>();
 		Person[] zoo = new Person[count];
-		zoo = build(personBuk, friendsBuk);	
+		zoo = build(personBuk, friendsBuk, hash);	
 
 		int choice = getChoice();
 		while (choice != QUIT) {
@@ -73,7 +70,7 @@ public class Graph_Test {
 					String start = stdin.nextLine();
 					System.out.print("Enter the name of the target person => ");
 					String target = stdin.nextLine();
-					shortest(start, target, zoo); 
+					shortest(start, target, zoo, hash); 
 					break;
 				case CLIQUE: 
 					System.out.print("Enter the name of the school => ");
@@ -92,9 +89,9 @@ public class Graph_Test {
 				zoo[i].back = -1;
 			}
 		}
-	}
-	
-	public static Person[] build(String[] people, ArrayList<String> friends){
+	}		//end main method
+
+	public static Person[] build(String[] people, ArrayList<String> friends, Hashtable<String, Integer> hash){
 		Person[] zoo = new Person[people.length];
 		for(int i=0; i<people.length; i++){		// go through names and make them people
 			String raw = people[i];
@@ -108,6 +105,7 @@ public class Graph_Test {
 			}
 			Person body = new Person(name, school, null, false, -1,-1,-1,-1);	//create a new person
 			zoo[i]= body;							//put him in the zoo
+			hash.put(body.name, i);					//
 		}
 
 		for(int j=0; j<friends.size()-1; j++){		//go through the friends
@@ -143,7 +141,9 @@ public class Graph_Test {
 			}
 		}
 		return zoo;		
-	}
+	}				//end build
+
+
 	public static ArrayList<Person> subgraph(String school, Person[] zoo, boolean printSub){
 
 		ArrayList<Person> schoolZoo = new ArrayList<>();
@@ -177,9 +177,8 @@ public class Graph_Test {
 		if(printSub){
 			printSub(schoolZoo, zoo);
 		}
-
 		return schoolZoo;
-	}
+	}						//end subgraph
 
 	public static void printSub(ArrayList<Person> schoolZoo, Person[] zoo){
 		for(int i=0; i<schoolZoo.size(); i++){		//print out names and school--- i.e. "nick|y|rutgers"
@@ -206,23 +205,19 @@ public class Graph_Test {
 				ptr=ptr.next;
 			}
 		}
-	}
+	}		//end printSub
 
-	public static void shortest(String start, String target, Person[] zoo)throws IOException {
+	public static void shortest(String start, String target, Person[] zoo, Hashtable<String, Integer> hash)throws IOException {
 		Person perStart = null;
 		Stack<Person> printStack = new Stack<Person>();
 		Queue<Integer> newQ = new LinkedList<Integer>();
 		boolean complete = false;		//SS
-		
-		for(int i=0; i<zoo.length;i++){ // finds the start person in zoo
-			if(zoo[i].name.equalsIgnoreCase(start)){
-				perStart = zoo[i];
-				zoo[i].zooIndex= i;
-				newQ.add(i);  // add the start person to queue for BFS
-				break;			// SS added--- person found break out of loop
-			}
-		}
-		
+
+		int i = hash.get(start);		// finds the start person in zoo
+		perStart = zoo[i];
+		perStart.zooIndex = i;
+		newQ.add(i);			 // add the start person to queue for BFS
+
 		while (!newQ.isEmpty()){          //BFS queue build
 			if(complete) break;		//SS
 			zoo[newQ.peek()].visited = true;
@@ -264,7 +259,7 @@ public class Graph_Test {
 			answer = answer.substring(0,answer.length()-2);
 			System.out.println(answer);
 		}
-	}
+	}		//end shortest
 
 
 	public static void cliques(String school, Person[] zoo){
@@ -280,9 +275,9 @@ public class Graph_Test {
 			if(!vert.visited){		//the person has not been visited so he must be part of a new clique
 				addClique =true;
 				newQ.add(vert);
-				while(!newQ.isEmpty()){
+				while(!newQ.isEmpty()){					//BFS queue
 					Person justDQd = newQ.remove();
-					justDQd.visited = true;				//maybe mixing up schoolZoo and zoo visited
+					justDQd.visited = true;				
 					newClique.add(justDQd);
 					Friendex ptr = justDQd.front;
 					while(ptr != null){				//go through LL horizontally 
@@ -307,40 +302,53 @@ public class Graph_Test {
 				System.out.println(name + "|" + "y" + "|" + sch);
 			}
 		}
-	}
-	
+	}		//end cliques
+
 	public static void connectors(Person[] zoo){
 		dfs(zoo);
 	}
-	
+
 	private static void dfs(Person[] zoo){
+		int count=1;
 		for(int i=0; i<zoo.length; i++){		//move vertically looking for new cliques
 			Person dfsStart = zoo[i];
-			
+
 			if(!dfsStart.visited){
 				Stack<Person> dfsStack = new Stack<Person>();
 				dfsStack.push(dfsStart);
-				dfsStart.visited=true;
 				while(!dfsStack.isEmpty()){			//stack allows forward movement when push and backward when popped
 					Person curr = dfsStack.peek();
+					if(!curr.visited){
+						curr.dfs = count;
+						curr.back = count;
+						count++;
+						curr.visited = true;
+					}
 					Friendex ptr = curr.front;
 					while(ptr != null){						//moves horizontally through friends
 						if(!zoo[ptr.friendNum].visited){	//get the first friend that isn't already visited
 							Person currFriend = zoo[ptr.friendNum];
-							currFriend.visited =true;
 							dfsStack.push(currFriend);		//moving forward in graph
 							break;
+						}else{
+							Person v = curr;
+							Person w = zoo[ptr.friendNum];
+							v.back = Math.min(v.back, w.dfs);
 						}
 						ptr = ptr.next;
 					}
-					if(ptr == null){		//no more friends
-						Person backwards = dfsStack.pop();
+					if(ptr == null){		//end of the dfs line---- start going backwards
+						if(curr.dfs == dfsStart.dfs){
+							break;				//needs revision----reached the start
+						}
+						Person v = dfsStack.pop();
+						Person w = dfsStack.peek();
+						if(v.dfs>w.back){
+							v.back = Math.min(v.back, w.dfs);
+						}
 					}
-					
 				}
 			}
 		}
-		
 	}
-	
 }	//end GraphTest class
