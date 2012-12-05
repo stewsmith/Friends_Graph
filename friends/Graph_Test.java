@@ -79,6 +79,7 @@ public class Graph_Test {
 					break;	
 				case CONNECT: 
 					connectors(zoo);
+					System.out.println("Not done yet");
 					break;    
 				default: break;
 				}
@@ -330,7 +331,7 @@ public class Graph_Test {
 							Person currFriend = zoo[ptr.friendNum];
 							dfsStack.push(currFriend);		//moving forward in graph
 							break;
-						}else{
+						}else{						//this is wrong suspicion 
 							Person v = curr;
 							Person w = zoo[ptr.friendNum];
 							v.back = Math.min(v.back, w.dfs);
@@ -343,8 +344,8 @@ public class Graph_Test {
 						}
 						Person v = dfsStack.pop();
 						Person w = dfsStack.peek();
-						if(v.dfs>w.back){
-							v.back = Math.min(v.back, w.dfs);
+						if(v.dfs>w.back){					//or this is wrong
+							v.back = Math.min(v.back, w.back);
 						}
 					}
 				}
