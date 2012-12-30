@@ -1,5 +1,7 @@
-/*Written by Stewart Smith and Jake Skelci for CS 112 Fall 2012*/
-
+/*Written by Stewart Smith and Jake Skelci for CS 112 Fall 2012
+ * 
+ * Uses BFS and DFS to find subgraphs, shortest paths, cliques, and connectors
+ * */
 package friends;
 
 import java.io.*;
